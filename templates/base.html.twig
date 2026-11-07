@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ site().siteName }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ site().metaDescription }}{% endblock %}">
+    <meta property="og:site_name" content="{{ site().siteName }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ block('title') }}">
+    <meta property="og:description" content="{{ block('description') }}">
+    <meta property="og:url" content="{{ app.request.uri }}">
+    <meta name="twitter:card" content="summary_large_image">
+    {% block og_image %}{% endblock %}
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="{{ asset('assets/site.css') }}">
+    {% block head_extra %}{% endblock %}
+    <script src="{{ asset('assets/site.js') }}" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="masthead">
+    <div class="wrap bar">
+        <a class="brand" href="{{ path('home') }}">{{ site().siteName }}</a>
+        <button class="burger" type="button" data-burger aria-expanded="false" aria-controls="nav">Menu</button>
+        <nav id="nav" data-nav aria-label="Navigation principale">
+            <a href="{{ path('home') }}#apps">Applications</a>
+            <a href="{{ path('page_about') }}">À propos</a>
+            <a href="{{ path('contact') }}">Contact</a>
+            {% if is_granted('ROLE_ADMIN') %}<a class="adminlink" href="{{ path('admin_dashboard') }}">Administration</a>{% endif %}
+        </nav>
+    </div>
+</header>
+<main id="main" class="wrap">
+    {% if app.request.hasPreviousSession %}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}<div class="flash {{ type }}" role="status">{{ message }}</div>{% endfor %}
+        {% endfor %}
+    {% endif %}
+    {% block body %}{% endblock %}
+</main>
+<footer class="foot">
+    <div class="wrap">
+        <p>© {{ 'now'|date('Y') }} {{ site().siteName }}</p>
+        <p><a href="{{ path('page_legal') }}">Mentions légales</a> <a href="{{ path('page_privacy') }}">Confidentialité</a> <a href="{{ path('contact') }}">Contact</a></p>
+    </div>
+</footer>
+</body>
+</html>

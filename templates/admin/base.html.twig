@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}Administration{% endblock %} | {{ site().siteName }}</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="{{ asset('assets/admin.css') }}">
+    <script src="{{ asset('assets/admin.js') }}" defer></script>
+</head>
+<body class="admin">
+<aside class="side">
+    <p class="brand">{{ site().siteName }}</p>
+    <nav aria-label="Administration">
+        <a href="{{ path('admin_dashboard') }}">Tableau de bord</a>
+        <a href="{{ path('admin_apps') }}">Applications</a>
+        <a href="{{ path('admin_messages') }}">Messages</a>
+        <a href="{{ path('admin_settings') }}">Réglages du site</a>
+        <a href="{{ path('home') }}" target="_blank" rel="noopener">Voir le site</a>
+        <a href="{{ path('app_logout') }}">Déconnexion</a>
+    </nav>
+</aside>
+<main class="content">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}<div class="flash {{ type }}" role="{{ type == 'error' ? 'alert' : 'status' }}">{{ message }}</div>{% endfor %}
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+</body>
+</html>

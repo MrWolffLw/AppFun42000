@@ -1,0 +1,37 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Applications{% endblock %}
+{% block body %}
+<div class="head"><h1>Applications</h1><a class="btn" href="{{ path('admin_app_new') }}">Ajouter une application</a></div>
+
+{% if apps is empty %}
+    <p class="muted">Aucune application pour l’instant. Commencez par en ajouter une.</p>
+{% else %}
+<div class="tablewrap">
+<table>
+    <thead><tr><th>Application</th><th>État</th><th>Médias</th><th>Ordre</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for a in apps %}
+        <tr>
+            <td class="nameCell">
+                {% if a.iconFilename %}<img class="thumb" src="{{ asset('uploads/icons/' ~ a.iconFilename) }}" alt="" width="40" height="40">{% else %}<span class="thumb ph" aria-hidden="true">{{ a.name|slice(0, 1)|upper }}</span>{% endif %}
+                <a href="{{ path('admin_app_edit', {id: a.id}) }}"><strong>{{ a.name }}</strong></a>
+            </td>
+            <td>{% if a.published %}<span class="badge ok">Publiée</span>{% else %}<span class="badge">Brouillon</span>{% endif %}</td>
+            <td>{{ a.media|length }}</td>
+            <td class="nowrap">
+                <form method="post" action="{{ path('admin_app_move', {id: a.id, dir: 'up'}) }}" class="inline"><input type="hidden" name="_token" value="{{ csrf_token('app-' ~ a.id) }}"><button class="btn small ghost" {% if loop.first %}disabled{% endif %} aria-label="Monter {{ a.name }}">↑</button></form>
+                <form method="post" action="{{ path('admin_app_move', {id: a.id, dir: 'down'}) }}" class="inline"><input type="hidden" name="_token" value="{{ csrf_token('app-' ~ a.id) }}"><button class="btn small ghost" {% if loop.last %}disabled{% endif %} aria-label="Descendre {{ a.name }}">↓</button></form>
+            </td>
+            <td class="nowrap">
+                <a class="btn small ghost" href="{{ path('admin_app_edit', {id: a.id}) }}">Modifier</a>
+                <a class="btn small ghost" href="{{ path('app_show', {slug: a.slug}) }}" target="_blank" rel="noopener">Voir</a>
+                <form method="post" action="{{ path('admin_app_toggle', {id: a.id}) }}" class="inline"><input type="hidden" name="_token" value="{{ csrf_token('app-' ~ a.id) }}"><button class="btn small ghost">{{ a.published ? 'Masquer' : 'Publier' }}</button></form>
+                <form method="post" action="{{ path('admin_app_delete', {id: a.id}) }}" class="inline" data-confirm="Supprimer « {{ a.name }} » avec toutes ses images et vidéos ? Cette action est définitive."><input type="hidden" name="_token" value="{{ csrf_token('app-' ~ a.id) }}"><button class="btn small danger">Supprimer</button></form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endif %}
+{% endblock %}

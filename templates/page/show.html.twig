@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }} | {{ site().siteName }}{% endblock %}
+
+{% block body %}
+<article class="narrow prose">
+    {{ content|markdown }}
+</article>
+{% endblock %}

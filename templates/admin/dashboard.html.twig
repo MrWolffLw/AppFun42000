@@ -1,0 +1,15 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Tableau de bord{% endblock %}
+{% block body %}
+<h1>Tableau de bord</h1>
+<div class="stats">
+    <div class="stat"><span class="n">{{ total }}</span><span>application{{ total > 1 ? 's' : '' }}</span></div>
+    <div class="stat"><span class="n">{{ published }}</span><span>publiée{{ published > 1 ? 's' : '' }}</span></div>
+    <div class="stat"><span class="n">{{ media }}</span><span>média{{ media > 1 ? 's' : '' }}</span></div>
+    <div class="stat {{ unread ? 'alert' : '' }}"><span class="n">{{ unread }}</span><span>message{{ unread > 1 ? 's' : '' }} non lu{{ unread > 1 ? 's' : '' }}</span></div>
+</div>
+<p class="actions">
+    <a class="btn" href="{{ path('admin_app_new') }}">Ajouter une application</a>
+    <a class="btn ghost" href="{{ path('admin_settings') }}">Modifier les textes du site</a>
+</p>
+{% endblock %}

@@ -1,0 +1,24 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    default_locale: fr
+    http_method_override: false
+    handle_all_throwables: true
+    csrf_protection: true
+    session:
+        handler_id: null
+        cookie_secure: auto
+        cookie_samesite: lax
+    php_errors:
+        log: true
+    translator:
+        default_path: '%kernel.project_dir%/translations'
+        fallbacks: ['fr']
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+    rate_limiter:
+        # Formulaire de contact : 5 messages par heure et par adresse IP
+        contact:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'
+

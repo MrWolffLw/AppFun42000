@@ -1,0 +1,14 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Message de {{ message.name }}{% endblock %}
+{% block body %}
+<div class="head"><h1>Message de {{ message.name }}</h1><a class="btn ghost" href="{{ path('admin_messages') }}">← Retour</a></div>
+<div class="panel">
+    <p class="muted small">Reçu le {{ message.createdAt|date('d/m/Y à H:i') }}</p>
+    <p><strong>{{ message.name }}</strong> &lt;<a href="mailto:{{ message.email }}">{{ message.email }}</a>&gt;</p>
+    <p class="msgbody">{{ message.message|nl2br }}</p>
+    <p class="actions">
+        <a class="btn" href="mailto:{{ message.email }}">Répondre</a>
+        <form method="post" action="{{ path('admin_message_delete', {id: message.id}) }}" class="inline" data-confirm="Supprimer ce message ?"><input type="hidden" name="_token" value="{{ csrf_token('message-' ~ message.id) }}"><button class="btn danger">Supprimer</button></form>
+    </p>
+</div>
+{% endblock %}

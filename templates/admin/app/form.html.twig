@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}{{ application.id ? 'Modifier ' ~ application.name : 'Nouvelle application' }}{% endblock %}
+{% block body %}
+<div class="head">
+    <h1>{{ application.id ? application.name : 'Nouvelle application' }}</h1>
+    <p class="actions">
+        <a class="btn ghost" href="{{ path('admin_apps') }}">← Retour à la liste</a>
+        {% if application.id %}<a class="btn ghost" href="{{ path('app_show', {slug: application.slug}) }}" target="_blank" rel="noopener">Voir la page</a>{% endif %}
+    </p>
+</div>
+
+{{ form_start(form, {attr: {novalidate: 'novalidate', class: 'panel'}}) }}
+    <h2>Informations</h2>
+    <div class="grid2">
+        {% include '_field.html.twig' with {field: form.name} %}
+        {% include '_field.html.twig' with {field: form.slug} %}
+    </div>
+    {% include '_field.html.twig' with {field: form.tagline} %}
+    {% include '_field.html.twig' with {field: form.shortDescription} %}
+    {% include '_field.html.twig' with {field: form.description} %}
+    {% include '_field.html.twig' with {field: form.featuresText} %}
+    <div class="grid3">
+        {% include '_field.html.twig' with {field: form.category} %}
+        {% include '_field.html.twig' with {field: form.version} %}
+        {% include '_field.html.twig' with {field: form.accentColor} %}
+    </div>
+
+    <h2>Visuels</h2>
+    <div class="grid2">
+        <div>
+            {% if application.iconFilename %}<img class="preview icon" src="{{ asset('uploads/icons/' ~ application.iconFilename) }}" alt="Icône actuelle" width="96" height="96">{% endif %}
+            {% include '_field.html.twig' with {field: form.iconFile} %}
+            {% if application.iconFilename %}{% include '_field.html.twig' with {field: form.removeIcon} %}{% endif %}
+        </div>
+        <div>
+            {% if application.coverFilename %}<img class="preview cover" src="{{ asset('uploads/covers/' ~ application.coverFilename) }}" alt="Couverture actuelle">{% endif %}
+            {% include '_field.html.twig' with {field: form.coverFile} %}
+            {% if application.coverFilename %}{% include '_field.html.twig' with {field: form.removeCover} %}{% endif %}
+        </div>
+    </div>
+
+    <h2>Liens</h2>
+    <div class="grid2">
+        {% include '_field.html.twig' with {field: form.googlePlayUrl} %}
+        {% include '_field.html.twig' with {field: form.appStoreUrl} %}
+        {% include '_field.html.twig' with {field: form.websiteUrl} %}
+        {% include '_field.html.twig' with {field: form.privacyUrl} %}
+    </div>
+
+    <h2>Publication</h2>
+    <div class="grid2">
+        {% include '_field.html.twig' with {field: form.published} %}
+        {% include '_field.html.twig' with {field: form.position} %}
+    </div>
+    <p><button class="btn" type="submit">{{ application.id ? 'Enregistrer les modifications' : 'Créer l’application' }}</button></p>
+{{ form_end(form) }}
+
+{% if imageForm and videoForm %}
+<section id="medias" class="panel">
+    <h2>Images et vidéos</h2>
+    <p class="muted">Ajoutez autant de captures d’écran et de vidéos que vous voulez. Elles s’affichent dans cet ordre sur la page de l’application.</p>
+
+    <div class="grid2">
+        <div>
+            <h3>Ajouter des images</h3>
+            {{ form_start(imageForm, {attr: {novalidate: 'novalidate'}}) }}
+                {% include '_field.html.twig' with {field: imageForm.files} %}
+                <button class="btn" type="submit">Envoyer les images</button>
+            {{ form_end(imageForm) }}
+        </div>
+        <div>
+            <h3>Ajouter une vidéo</h3>
+            {{ form_start(videoForm, {attr: {novalidate: 'novalidate'}}) }}
+                {% include '_field.html.twig' with {field: videoForm.url} %}
+                {% include '_field.html.twig' with {field: videoForm.file} %}
+                {% include '_field.html.twig' with {field: videoForm.caption} %}
+                <button class="btn" type="submit">Ajouter la vidéo</button>
+            {{ form_end(videoForm) }}
+        </div>
+    </div>
+
+    <h3>Médias de cette application ({{ application.media|length }})</h3>
+    {% if application.media is empty %}
+        <p class="muted">Aucun média pour l’instant.</p>
+    {% else %}
+    <ul class="media-list">
+        {% for m in application.media %}
+            <li class="media-item">
+                <div class="mthumb">
+                    {% if m.isImage %}<img src="{{ asset('uploads/images/' ~ m.filename) }}" alt="" loading="lazy">
+                    {% elseif m.isVideoFile %}<video src="{{ asset('uploads/videos/' ~ m.filename) }}" preload="metadata" muted></video>
+                    {% else %}<span class="badge">{{ m.embedProvider|capitalize }}</span>{% endif %}
+                </div>
+                <div class="mbody">
+                    <p class="muted small">{{ m.isImage ? 'Image' : (m.isVideoFile ? 'Vidéo (fichier)' : 'Vidéo ' ~ m.embedProvider|capitalize) }}</p>
+                    <form method="post" action="{{ path('admin_media_caption', {id: m.id}) }}" class="inline caption">
+                        <input type="hidden" name="_token" value="{{ csrf_token('media-' ~ m.id) }}">
+                        <input type="text" name="caption" value="{{ m.caption }}" maxlength="200" placeholder="Légende (facultative)" aria-label="Légende du média {{ loop.index }}">
+                        <button class="btn small ghost">Enregistrer</button>
+                    </form>
+                </div>
+                <div class="mactions">
+                    <form method="post" action="{{ path('admin_media_move', {id: m.id, dir: 'up'}) }}" class="inline"><input type="hidden" name="_token" value="{{ csrf_token('media-' ~ m.id) }}"><button class="btn small ghost" {% if loop.first %}disabled{% endif %} aria-label="Monter">↑</button></form>
+                    <form method="post" action="{{ path('admin_media_move', {id: m.id, dir: 'down'}) }}" class="inline"><input type="hidden" name="_token" value="{{ csrf_token('media-' ~ m.id) }}"><button class="btn small ghost" {% if loop.last %}disabled{% endif %} aria-label="Descendre">↓</button></form>
+                    <form method="post" action="{{ path('admin_media_delete', {id: m.id}) }}" class="inline" data-confirm="Supprimer ce média ?"><input type="hidden" name="_token" value="{{ csrf_token('media-' ~ m.id) }}"><button class="btn small danger">Supprimer</button></form>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</section>
+{% elseif not application.id %}
+    <p class="muted">Enregistrez d’abord l’application pour pouvoir lui ajouter des images et des vidéos.</p>
+{% endif %}
+{% endblock %}

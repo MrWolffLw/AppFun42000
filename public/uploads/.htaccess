@@ -1,0 +1,5 @@
+# Les fichiers envoyés ne doivent jamais être exécutés comme du code.
+Options -Indexes -ExecCGI
+<FilesMatch "\.(php|phtml|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>

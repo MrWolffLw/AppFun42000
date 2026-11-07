@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<section class="hero">
+    <p class="eyebrow">{{ site().siteName }}</p>
+    <h1>{{ site().heroTitle }}</h1>
+    <p class="lead">{{ site().heroSubtitle }}</p>
+    <p class="actions">
+        <a class="btn" href="#apps">Découvrir mes applications</a>
+        <a class="btn ghost" href="{{ path('contact') }}">Me contacter</a>
+    </p>
+</section>
+
+<section id="apps" aria-labelledby="apps-title">
+    <h2 id="apps-title" class="section-title">Applications</h2>
+    {% if apps is empty %}
+        <p class="muted">Les premières applications arrivent bientôt.</p>
+    {% else %}
+        <ol class="index">
+            {% for a in apps %}
+                <li>
+                    <a class="row" href="{{ path('app_show', {slug: a.slug}) }}" style="--accent: {{ a.accentColor }}">
+                        <span class="num" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
+                        {% if a.iconFilename %}
+                            <img class="icon" src="{{ asset('uploads/icons/' ~ a.iconFilename) }}" alt="" width="72" height="72" loading="lazy">
+                        {% else %}
+                            <span class="icon placeholder" aria-hidden="true">{{ a.name|slice(0, 1)|upper }}</span>
+                        {% endif %}
+                        <span class="txt">
+                            <span class="name">{{ a.name }}</span>
+                            {% if a.tagline %}<span class="tag">{{ a.tagline }}</span>{% endif %}
+                        </span>
+                        {% if a.category %}<span class="meta">{{ a.category }}</span>{% endif %}
+                        <span class="arrow" aria-hidden="true">→</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+</section>
+{% endblock %}

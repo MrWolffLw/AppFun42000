@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>{{ url('home') }}</loc></url>
+    <url><loc>{{ url('page_about') }}</loc></url>
+    <url><loc>{{ url('contact') }}</loc></url>
+    <url><loc>{{ url('page_legal') }}</loc></url>
+    <url><loc>{{ url('page_privacy') }}</loc></url>
+{% for a in apps %}
+    <url><loc>{{ url('app_show', {slug: a.slug}) }}</loc><lastmod>{{ a.updatedAt|date('Y-m-d') }}</lastmod></url>
+{% endfor %}
+</urlset>

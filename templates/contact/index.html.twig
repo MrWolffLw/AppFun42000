@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact | {{ site().siteName }}{% endblock %}
+
+{% block body %}
+<section class="narrow">
+    <p class="eyebrow">Contact</p>
+    <h1>Me contacter</h1>
+    <p class="lead">Une question, une idée, un problème ? Écrivez-moi, je réponds rapidement.</p>
+    {% if site().contactEmail %}<p>Vous pouvez aussi écrire à <a href="mailto:{{ site().contactEmail }}">{{ site().contactEmail }}</a>.</p>{% endif %}
+
+    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+        {% include '_field.html.twig' with {field: form.name} %}
+        {% include '_field.html.twig' with {field: form.email} %}
+        {% include '_field.html.twig' with {field: form.message} %}
+        <div class="hp-wrap" aria-hidden="true">{{ form_widget(form.website) }}</div>
+        <button class="btn" type="submit">Envoyer le message</button>
+    {{ form_end(form) }}
+    <p class="muted small">Les informations saisies servent uniquement à vous répondre. Voir la <a href="{{ path('page_privacy') }}">politique de confidentialité</a>.</p>
+</section>
+{% endblock %}

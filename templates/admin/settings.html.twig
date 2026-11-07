@@ -1,0 +1,18 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Réglages du site{% endblock %}
+{% block body %}
+<h1>Réglages du site</h1>
+{{ form_start(form, {attr: {novalidate: 'novalidate', class: 'panel'}}) }}
+    <h2>Accueil et référencement</h2>
+    {% include '_field.html.twig' with {field: form.siteName} %}
+    {% include '_field.html.twig' with {field: form.heroTitle} %}
+    {% include '_field.html.twig' with {field: form.heroSubtitle} %}
+    {% include '_field.html.twig' with {field: form.metaDescription} %}
+    <h2>Pages de texte</h2>
+    {% include '_field.html.twig' with {field: form.contactEmail} %}
+    {% include '_field.html.twig' with {field: form.aboutText} %}
+    {% include '_field.html.twig' with {field: form.legalText} %}
+    {% include '_field.html.twig' with {field: form.privacyText} %}
+    <p><button class="btn" type="submit">Enregistrer</button></p>
+{{ form_end(form) }}
+{% endblock %}

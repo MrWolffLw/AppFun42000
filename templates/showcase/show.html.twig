@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ application.name }}{% if application.tagline %}, {{ application.tagline }}{% endif %} | {{ site().siteName }}{% endblock %}
+{% block description %}{{ application.shortDescription ?: application.tagline ?: site().metaDescription }}{% endblock %}
+
+{% block og_image %}
+    {% if application.coverFilename %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/covers/' ~ application.coverFilename)) }}">
+    {% elseif application.iconFilename %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/icons/' ~ application.iconFilename)) }}">
+    {% endif %}
+{% endblock %}
+
+{% block head_extra %}
+    {% set platforms = [] %}
+    {% if application.googlePlayUrl %}{% set platforms = platforms|merge(['Android']) %}{% endif %}
+    {% if application.appStoreUrl %}{% set platforms = platforms|merge(['iOS']) %}{% endif %}
+    {% set ld = {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        'name': application.name,
+        'description': application.shortDescription ?: application.tagline,
+        'applicationCategory': application.category ?: 'MobileApplication',
+        'operatingSystem': platforms ? platforms|join(', ') : 'Web'
+    } %}
+    {# json_encode(15) = échappe < > & ' " : le contenu ne peut pas fermer la balise script #}
+    <script type="application/ld+json">{{ ld|json_encode(15)|raw }}</script>
+{% endblock %}
+
+{% block body %}
+<article class="app" style="--accent: {{ application.accentColor }}">
+    {% if not application.published %}<p class="notice">Brouillon : cette page n’est visible que par vous.</p>{% endif %}
+
+    <header class="app-head">
+        {% if application.iconFilename %}
+            <img class="icon lg" src="{{ asset('uploads/icons/' ~ application.iconFilename) }}" alt="Icône de {{ application.name }}" width="112" height="112">
+        {% else %}
+            <span class="icon lg placeholder" aria-hidden="true">{{ application.name|slice(0, 1)|upper }}</span>
+        {% endif %}
+        <div>
+            {% set eyebrow = [application.category, application.version ? 'version ' ~ application.version : null]|filter(v => v) %}
+            {% if eyebrow %}<p class="eyebrow">{{ eyebrow|join(', ') }}</p>{% endif %}
+            <h1>{{ application.name }}</h1>
+            {% if application.tagline %}<p class="lead">{{ application.tagline }}</p>{% endif %}
+            <p class="actions">
+                {% if application.googlePlayUrl %}<a class="btn" href="{{ application.googlePlayUrl }}" target="_blank" rel="noopener noreferrer">Google Play</a>{% endif %}
+                {% if application.appStoreUrl %}<a class="btn" href="{{ application.appStoreUrl }}" target="_blank" rel="noopener noreferrer">App Store</a>{% endif %}
+                {% if application.websiteUrl %}<a class="btn ghost" href="{{ application.websiteUrl }}" target="_blank" rel="noopener noreferrer">Site web</a>{% endif %}
+            </p>
+        </div>
+    </header>
+
+    {% if application.coverFilename %}
+        <img class="cover" src="{{ asset('uploads/covers/' ~ application.coverFilename) }}" alt="">
+    {% endif %}
+
+    {% if application.description %}
+        <section class="prose" aria-label="Présentation">{{ application.description|markdown }}</section>
+    {% endif %}
+
+    {% if application.features %}
+        <section aria-labelledby="features-title">
+            <h2 id="features-title" class="section-title">Points forts</h2>
+            <ul class="features">
+                {% for f in application.features %}<li>{{ f }}</li>{% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if application.media|length %}
+        <section id="media" aria-labelledby="media-title">
+            <h2 id="media-title" class="section-title">Captures et vidéos</h2>
+            <ul class="strip" tabindex="0" aria-label="Galerie, faites défiler horizontalement">
+                {% for m in application.media %}
+                    <li class="item {{ m.type }}">
+                        {% if m.isImage %}
+                            <button type="button" class="shot" data-lightbox data-full="{{ asset('uploads/images/' ~ m.filename) }}" data-caption="{{ m.caption }}">
+                                <img src="{{ asset('uploads/images/' ~ m.filename) }}" alt="{{ m.caption ?: application.name ~ ', capture d’écran ' ~ loop.index }}" loading="lazy">
+                            </button>
+                        {% elseif m.isVideoFile %}
+                            <video controls preload="metadata" playsinline src="{{ asset('uploads/videos/' ~ m.filename) }}" aria-label="{{ m.caption ?: 'Vidéo de présentation' }}"></video>
+                        {% elseif m.embedUrl %}
+                            <button type="button" class="facade" data-embed="{{ m.embedUrl }}" aria-label="Lire la vidéo{{ m.caption ? ' : ' ~ m.caption : '' }}">
+                                <span class="play" aria-hidden="true">▶</span>
+                                <span class="facade-label">Lire la vidéo</span>
+                            </button>
+                        {% endif %}
+                        {% if m.caption %}<p class="cap">{{ m.caption }}</p>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if application.privacyUrl %}
+        <p class="muted"><a href="{{ application.privacyUrl }}" target="_blank" rel="noopener noreferrer">Politique de confidentialité de {{ application.name }}</a></p>
+    {% endif %}
+
+    {% if others %}
+        <section aria-labelledby="others-title">
+            <h2 id="others-title" class="section-title">Mes autres applications</h2>
+            <ul class="others">
+                {% for o in others %}
+                    <li><a href="{{ path('app_show', {slug: o.slug}) }}" style="--accent: {{ o.accentColor }}">
+                        {% if o.iconFilename %}<img class="icon sm" src="{{ asset('uploads/icons/' ~ o.iconFilename) }}" alt="" width="40" height="40" loading="lazy">{% else %}<span class="icon sm placeholder" aria-hidden="true">{{ o.name|slice(0, 1)|upper }}</span>{% endif %}
+                        <span>{{ o.name }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+</article>
+
+<dialog id="lightbox" aria-label="Aperçu de l’image">
+    <button type="button" class="lb-close" aria-label="Fermer">×</button>
+    <button type="button" class="lb-prev" aria-label="Image précédente">‹</button>
+    <figure><img alt=""><figcaption></figcaption></figure>
+    <button type="button" class="lb-next" aria-label="Image suivante">›</button>
+</dialog>
+{% endblock %}
